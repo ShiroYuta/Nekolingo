@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - name: Usar o número da versão da tag
+        shell: bash
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
+      - name: Gerar instalador do Windows e publicar
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  android:
+    needs: windows
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm install
+      - name: Apontar o app para o site publicado
+        run: sed -i "s#__SITE_URL__#https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/#" capacitor.config.json
+      - run: npx cap add android
+      - name: Ícone do gato
+        continue-on-error: true
+        run: npx @capacitor/assets generate --android
+      - name: Gerar APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - name: Nomear o APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Nekolingo.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: Nekolingo.apk
