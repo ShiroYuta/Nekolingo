@@ -1,0 +1,9 @@
+{
+  "appId": "com.joel.nekolingo",
+  "appName": "Nekolingo",
+  "webDir": "web",
+  "server": {
+    "url": "__SITE_URL__",
+    "androidScheme": "https"
+  }
+}
