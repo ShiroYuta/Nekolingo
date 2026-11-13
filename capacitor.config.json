@@ -4,6 +4,10 @@
   "webDir": "web",
   "server": {
     "url": "__SITE_URL__",
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "allowNavigation": [
+      "shiroyuta.github.io",
+      "*.github.io"
+    ]
   }
 }

@@ -1526,5 +1526,19 @@ details.card[open] summary { margin-bottom: 10px; }
 
 })();
 </script>
+<style>.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-weight:700;display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px)}.toast[hidden]{display:none}.toast button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:6px 12px;font:inherit;font-weight:800;cursor:pointer}</style>
+<div class="toast" id="upd" hidden role="status"><span>Tem versão nova do app.</span><button id="updbtn">Atualizar</button></div>
+<script>
+(function(){
+  if(!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+  var had = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(had){ var u=document.getElementById('upd'); if(u) u.hidden=false; }
+    had = true;
+  });
+  var b=document.getElementById('updbtn'); if(b) b.onclick=function(){ location.reload(); };
+})();
+</script>
 </body>
 </html>
